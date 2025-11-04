@@ -1,36 +1,72 @@
+"""
+Maze visualization and rendering module.
+
+This module provides functions for drawing mazes and creating animated visualizations
+of agent movement through the maze. It uses PIL (Pillow) for image generation and
+supports both static maze images and animated GIFs showing solution paths.
+"""
+
 from cell import Cell
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-# Some predefined values for the visualization
-margin = 80
-cell_side = 100
-line_thickness = 10
+# Visualization constants
+margin = 80          # Image margin in pixels
+cell_side = 100      # Cell size in pixels
+line_thickness = 10  # Wall thickness in pixels
 
 
 class PathNotFound(Exception):
-    """Exception raised when maze path is not found."""
+    """
+    Exception raised when maze path is not found.
+
+    This exception is thrown when attempting to create an animated visualization
+    but the agent was unable to find a valid path from start to goal.
+    """
 
     def __init__(self, message="Maze path was not found, unable to draw a gif. Please try different parameters."):
+        """
+        Initialize the PathNotFound exception.
+
+        Args:
+            message (str): Error message describing the path finding failure.
+        """
         self.message = message
         super().__init__(self.message)
 
 
 def draw_cell(cell, image, color="black", count=0, wide=5, method="grid"):
-    # Cell coordinates on the image calculated from its (x, y) coordinates,
-    # cell side length (100 pt), image margin (90 pt) and line thickness (10 pt).
+    """
+    Draw a single cell of the maze with its walls and labels.
+
+    This function renders a cell by drawing its walls (if present) and adding
+    appropriate text labels for start/end positions or cell numbers.
+
+    Args:
+        cell (Cell): The cell object to draw.
+        image (ImageDraw): PIL ImageDraw object to draw on.
+        color (str): Color for drawing walls (default: "black").
+        count (int): Cell number for grid labeling (default: 0).
+        wide (int): Line width for walls (default: 5).
+        method (str): Drawing method - "grid" shows numbers, others don't (default: "grid").
+    """
+    # Calculate cell center coordinates on the image
     x = margin + line_thickness + cell.x * cell_side
     y = margin + line_thickness + cell.y * cell_side
 
+    # Define wall line coordinates (North, South, East, West)
     lines = [(x - cell_side / 2, y - cell_side / 2), (x + cell_side / 2, y - cell_side / 2)], \
         [(x - cell_side / 2, y + cell_side / 2), (x + cell_side / 2, y + cell_side / 2)], \
         [(x + cell_side / 2, y - cell_side / 2), (x + cell_side / 2, y + cell_side / 2)], \
         [(x - cell_side / 2, y - cell_side / 2),
          (x - cell_side / 2, y + cell_side / 2)]
 
+    # Draw only the walls that are present
     shown_walls = [i for (i, v) in zip(lines, cell.walls.values()) if v]
     for wall in shown_walls:
         image.line(wall, fill=color, width=wide)
+
+    # Add text labels for special cells (Start/End)
     if cell.status == 'Start' or cell.status == 'End':
         try:
             font = ImageFont.truetype("Arial Unicode.ttf", 18)
@@ -41,6 +77,7 @@ def draw_cell(cell, image, color="black", count=0, wide=5, method="grid"):
             image.text((x - 25, y - 10), cell.status.upper(),
                        (255, 0, 0), font=font)
     else:
+        # Add cell numbers for grid visualization
         if method == "grid":
             try:
                 font = ImageFont.truetype("Arial Unicode.ttf", 18)
