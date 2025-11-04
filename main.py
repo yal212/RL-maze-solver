@@ -1,5 +1,4 @@
 from maze import Maze
-from convert import Feasibility
 from draw import draw_maze
 import pandas as pd
 
@@ -28,7 +27,7 @@ if __name__ == "__main__":
         try:
             start = input('Enter x and y coordinates of the maze start separated by a space: ').split()
             start_x, start_y = int(start[0]), int(start[1])
-            if start_x <= dimension1 and start_y <= dimension2:
+            if 0 <= start_x < dimension1 and 0 <= start_y < dimension2:
                 break
             else:
                 print("Start coordinates should be inside the maze. Numbering is zero-based.")

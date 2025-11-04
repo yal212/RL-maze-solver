@@ -1,6 +1,6 @@
 import numpy as np
 
-from practice.task.maze import Maze
+from maze import Maze
 
 
 def find_reachable_neighbors(maze, cell):

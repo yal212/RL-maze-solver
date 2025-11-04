@@ -3,7 +3,7 @@ from random import random, randint
 
 import numpy as np
 from convert import find_reachable_neighbors
-from practice.task.convert import Feasibility
+from convert import Feasibility
 
 
 def get_possible_next_states(state: int, f_matrix: np.array, n_states: int) -> list[int]:
